@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>快店快点</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <header class="app-header"><div class="header-inner"><a class="brand" href="manage.html"><img src="icons/icon48.png" width="40" height="40" alt=""><span>快店快点</span></a><span class="header-caption">原生 Chrome · 登录资料留在本机</span><a href="help.html" target="_blank" rel="noopener" class="text-link">使用指南</a><button id="settings-button" class="button" type="button">连接设置</button></div></header>
+  <main class="workspace">
+    <div id="demo-banner" class="notice demo-notice" hidden>演示模式 · 仅使用示例数据，不连接 Chrome，不保存真实配置。</div>
+    <section class="page-heading"><div><h1>选店铺，直接进入后台</h1><p>跨平台共用资料，同平台账号分开。日常浏览习惯保持原样。</p></div><button id="add-shop" type="button" class="button primary" disabled>＋ 添加店铺</button></section>
+    <div id="connection-error" class="notice error-notice" role="alert" hidden><h2>先连接本地助手</h2><p id="connection-error-text"></p><div class="notice-actions"><button id="retry" type="button" class="button">重新连接</button><a class="text-link" href="setup.html" target="_blank" rel="noopener">连接本地助手 →</a></div></div>
+    <div id="warnings" class="notice" hidden></div>
+    <div class="workspace-columns">
+      <section class="shops-section" aria-label="店铺入口">
+        <div class="toolbar"><div class="filters" aria-label="平台筛选"><button class="filter active" type="button" data-filter="all" aria-pressed="true">全部</button><button class="filter" type="button" data-filter="JD" aria-pressed="false">京东</button><button class="filter" type="button" data-filter="alibaba" aria-pressed="false">淘宝 / 天猫</button><button class="filter" type="button" data-filter="Pdd" aria-pressed="false">PDD</button></div><input id="search" type="search" aria-label="搜索店铺或账号标识" placeholder="搜索店铺或账号" maxlength="100"></div>
+        <div class="section-meta"><span id="shop-count">等待连接…</span><button id="refresh" class="link-button" type="button">刷新资料</button></div>
+        <div id="shop-list" class="shop-grid"></div>
+        <div id="empty-state" class="empty-state" hidden><span class="empty-mark" aria-hidden="true">＋</span><h2>从第一家店铺开始</h2><p>选择平台，填入后台网址，再绑定一份现有 Chrome 资料。</p><button id="empty-add" class="button primary" type="button">添加店铺</button></div>
+        <div class="footnote">控制器只负责选择资料和打开入口，不读取 Cookie，也不判断平台是否已登录。</div>
+      </section>
+      <aside class="profile-panel"><div class="profile-panel-heading"><h2>资料配对</h2><span id="profile-count" class="count-badge">—</span></div><p class="panel-description">不同平台可以住在同一份资料里。淘宝与天猫按同一登录体系处理。</p><div id="profile-list" class="profile-list"></div><button id="plan-button" class="button full-width" type="button" disabled>查看精简配对方案</button><p class="panel-help">只调整控制器的入口绑定，不合并、搬运或删除任何 Chrome 登录数据。</p></aside>
+    </div>
+    <footer class="workspace-footer"><span>快店快点 1.0 · 本地运行</span><span id="connection-state">尚未连接</span></footer>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <dialog id="shop-dialog"><form id="shop-form"><div class="dialog-heading"><div><h2 id="shop-dialog-title">添加店铺</h2><p>账号标识只填昵称，不需要密码。</p></div><button type="button" class="close-button" data-close="shop-dialog" aria-label="关闭">×</button></div><input name="id" type="hidden">
+    <label>店铺名称<input name="name" required maxlength="100" placeholder="例如：华东旗舰店"></label>
+    <div class="form-grid"><label>所属平台<select name="platform" required></select></label><label>账号标识<input name="accountAlias" required maxlength="100" placeholder="例如：京东主账号"></label></div>
+    <p class="field-help">同一平台的同一登录账号，请使用相同标识；不同账号请用不同标识。</p>
+    <label>后台入口网址<input name="homeUrl" type="url" required maxlength="2048" placeholder="https://"></label><p class="field-help">使用普通后台入口，不填写含密码或临时登录凭证的网址。</p>
+    <label>绑定 Chrome 资料<select name="profileDirectory"></select></label>
+    <label>备注（选填）<input name="notes" maxlength="500" placeholder="如：客服账号 / 国际店 / 财务专用"></label>
+    <div class="notice compact">更换资料绑定后，请核对网页实际账号；必要时在新资料内重新登录。已有 Cookie 不会搬移。</div>
+    <p id="shop-error" class="form-error" role="alert" hidden></p><div class="dialog-actions"><button id="delete-shop" class="button danger-quiet" type="button" hidden>删除入口</button><span class="spacer"></span><button type="button" class="button" data-close="shop-dialog">取消</button><button id="save-shop" type="submit" class="button primary">保存店铺</button></div>
+  </form></dialog>
+  <dialog id="plan-dialog"><div class="dialog-heading"><div><h2>精简配对预览</h2><p id="plan-summary"></p></div><button type="button" class="close-button" data-close="plan-dialog" aria-label="关闭">×</button></div><p class="field-help">先勾选允许用于电商的资料，日常主资料可以不选。初始仅勾选已经绑定店铺的资料。</p><div id="profile-pool" class="profile-pool"></div><button id="recalculate-plan" class="button small" type="button">生成配对预览</button><div id="plan-rows" class="plan-rows"></div><div id="plan-warnings" class="notice compact"></div><p class="field-help">这是按已登记账号推导的配对，不是对现有登录状态的检测。原有资料及 Cookie 均保留。</p><div class="dialog-actions"><button type="button" class="button" data-close="plan-dialog">暂不调整</button><button id="apply-plan" type="button" class="button primary" disabled>确认修改入口绑定</button></div></dialog>
+  <dialog id="settings-dialog"><form id="settings-form"><div class="dialog-heading"><div><h2>Chrome 连接设置</h2><p>通常保持自动检测即可。</p></div><button type="button" class="close-button" data-close="settings-dialog" aria-label="关闭">×</button></div><label>Chrome 程序（留空自动检测）<input name="chromeExecutable" maxlength="1024" placeholder="C:\Program Files\Google\Chrome\Application\chrome.exe"></label><label>资料根目录（留空使用默认目录）<input name="userDataRoot" maxlength="1024" placeholder="…\Google\Chrome\User Data"></label><p class="field-help">这里是包含 Local State 的 User Data 根目录，不是 Profile 1 子目录。更换根目录后请重新核对店铺绑定。</p><div class="notice compact" id="detected-settings"></div><p id="settings-error" class="form-error" role="alert" hidden></p><div class="dialog-actions"><button type="button" class="button" data-close="settings-dialog">取消</button><button type="submit" class="button primary">保存设置</button></div></form></dialog>
+  <script type="module" src="manage.js"></script>
+</body></html>
+

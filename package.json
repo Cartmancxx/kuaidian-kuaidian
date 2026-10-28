@@ -1,0 +1,13 @@
+{
+  "name": "kuaidian-kuaidian",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Optional asset tooling for 快店快点; the extension has no npm runtime dependency.",
+  "license": "MIT",
+  "engines": {"node": ">=22"},
+  "scripts": {
+    "icons": "node ShopController/scripts/make-icons.cjs",
+    "test": "node ShopController.Tests/api_tests.cjs && node ShopController.Tests/default_pin_tests.cjs && node ShopController.Tests/launcher_tests.cjs && node ShopController.Tests/setup_tests.cjs"
+  },
+  "devDependencies": {"sharp": "0.35.5"}
+}

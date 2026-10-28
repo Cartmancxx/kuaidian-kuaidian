@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>连接助手 · 快店快点</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="setup.css"></head>
+<body><main class="setup-page">
+  <header class="setup-header"><a class="brand" href="manage.html"><img src="icons/icon48.png" width="32" height="32" alt="">快店快点</a><a href="privacy.html" class="text-link">隐私说明</a></header>
+  <h1>连接你的本地助手</h1><p class="setup-intro">只需安装一次。店铺后台仍在原生 Chrome 打开，账号与 Cookie 留在你自己的浏览器里。</p>
+  <section class="setup-state" aria-live="polite"><span id="connection-dot" class="state-dot"></span><div><h2 id="connection-title">正在检查连接…</h2><p id="connection-detail">检查本机助手版本，不访问店铺或登录信息。</p></div><button id="check" class="button" type="button">重新检查</button></section>
+  <ol class="setup-steps">
+    <li><h2>安装对应系统的助手</h2><p id="platform-instruction">选择与你电脑系统匹配的安装包。</p><a id="download" class="button primary" target="_blank" rel="noopener" hidden>打开官方下载页</a><p id="download-pending" class="notice compact" hidden>此提交草稿尚未配置公开下载地址。请使用开发者随交付包提供的助手，或联系下方支持邮箱获取安装包。</p><p class="field-help">Windows 支持置顶小窗；macOS 使用普通独立小窗。安装器不读取或迁移 Chrome Cookie。</p></li>
+    <li><h2>确认扩展身份</h2><p>如果安装器询问扩展 ID，复制下面的 ID。只安装你信任的开发者提供的助手。</p><div class="identity-row"><code id="extension-id">请在已安装的扩展中打开此页</code><button id="copy-id" class="button small" type="button" disabled>复制 ID</button></div><p id="copy-status" class="field-help" role="status"></p></li>
+    <li><h2>回到这里，检查连接</h2><p>连接后添加店铺，并选择对应的 Chrome 资料。首次打开后台，请核对真实店铺账号。</p><a id="enter" class="button" href="manage.html">进入店铺管理</a><a class="text-link help-link" href="help.html">安装与更新说明</a></li>
+  </ol>
+  <footer class="setup-footer"><span>开发者：程大意</span><a id="support" href="mailto:cartmancxx@gmail.com">cartmancxx@gmail.com</a><span>扩展 1.0.0 · 本地运行</span></footer>
+  <script type="module" src="setup.js"></script>
+</main></body></html>

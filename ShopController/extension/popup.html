@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>快店快点</title>
+  <link rel="stylesheet" href="compact.css">
+</head>
+<body class="launcher">
+  <header class="launcher-header">
+    <h1>快店快点<span id="demo-label" hidden>演示</span></h1>
+    <div class="header-actions">
+      <button id="pin" class="icon-button pin-button" type="button" title="读取置顶状态" aria-label="读取置顶状态" aria-pressed="mixed" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 3 6 0-1 5 3 3v1H5v-1l3-3-1-5ZM10 12v5"/></svg></button>
+      <button id="refresh" class="icon-button" type="button" title="刷新店铺" aria-label="刷新店铺"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 7A6 6 0 1 0 16 12M15.5 3.5V7H12"/></svg></button>
+      <button id="manage" class="manage-button" type="button">管理</button>
+    </div>
+  </header>
+  <div class="search-wrap">
+    <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg>
+    <input id="search" type="search" placeholder="找店铺" aria-label="搜索店铺或平台" autocomplete="off" maxlength="100">
+  </div>
+  <main id="stores" class="store-list" aria-label="店铺快捷入口"><p class="empty-state">正在加载…</p></main>
+  <a id="connect-link" class="connect-link" href="setup.html" target="_blank" rel="noopener" hidden>连接助手 →</a>
+  <p id="status" class="status" role="status" aria-live="polite" hidden></p>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "productName": "快店快点",
+  "version": "1.0.0",
+  "publisherName": "程大意",
+  "supportEmail": "cartmancxx@gmail.com",
+  "privacyPolicyUrl": "https://cartmancxx.github.io/kuaidian-kuaidian/privacy.html",
+  "downloadPageUrl": "https://cartmancxx.github.io/kuaidian-kuaidian/",
+  "extensionId": "",
+  "windowsSigned": false,
+  "macNotarized": false,
+  "windowsSmokeTested": false,
+  "macSmokeTested": false
+}
