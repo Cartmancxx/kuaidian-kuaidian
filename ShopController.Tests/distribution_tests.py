@@ -70,6 +70,9 @@ def main():
         for name in names:
             if name.endswith("/") or name in {"manifest.json", "release-info.json"}:
                 continue
+            if name == "LICENSE.txt":
+                require(archive.read(name) == (product.parent / "LICENSE").read_bytes(), "Generated extension MIT notice matches the repository license exactly")
+                continue
             current = product / "extension" / name
             require(current.is_file() and current.read_bytes() == archive.read(name), "Store payload matches reviewed current source: " + name)
         release_info = json.loads(archive.read("release-info.json"))

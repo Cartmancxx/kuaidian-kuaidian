@@ -173,7 +173,9 @@ def main() -> None:
         print(f"PASS  {name}", flush=True)
 
     with tempfile.TemporaryDirectory(prefix="ShopController.Protocol.") as folder:
-        root = Path(folder)
+        # Windows CI TEMP can use an 8.3 alias. Canonicalize the existing fixture
+        # parent before seeding paths so Python and .NET compare the same spelling.
+        root = Path(folder).resolve(strict=True)
         initial_exe, initial_data = fixture(root / "initial")
         active_exe, active_data = fixture(root / "active")
         config = root / "config.json"
@@ -247,9 +249,10 @@ def main() -> None:
             for entry in state["config"]["shops"]:
                 opened = ok(host.request("open_shop", id=entry["id"], revision=state["revision"]))
                 check(opened["testOnly"] is True and opened["opened"] is False, "open_shop must not launch in protocol tests")
-                check(f"--user-data-dir={active_data}" in opened["arguments"], "Root passed as one argument")
-                check(f"--profile-directory={entry['profileDirectory']}" in opened["arguments"], "Correct profile passed")
-                check(entry["homeUrl"] in opened["arguments"], "Exact URL passed without rewriting")
+                expected_arguments = [f"--user-data-dir={active_data}",
+                    f"--profile-directory={entry['profileDirectory']}", entry["homeUrl"]]
+                check(opened["arguments"] == expected_arguments,
+                    f"Exact shell-free argument array differs: expected={expected_arguments!r}; actual={opened['arguments']!r}")
             passed_step("open_shop only builds exact per-profile launch arguments")
 
             for request in (b'{"action":', b'[]', b'{"action":"unknown-operation"}', b'{}'):
