@@ -1,0 +1,56 @@
+[
+  {
+    "name": "outro-group-photo-launch",
+    "summary": "全片元素从四面八方飞来围住字标合影，crane 落机位+舞台光+金尘做成发布会收场",
+    "use": "outro/品牌收尾；多功能产品的\"全家福\"式终镜",
+    "duration": "约 4.8s（145f）",
+    "energy": "峰值（全片最高点）",
+    "intention": "把看过的每个功能各抽一个代表元素叫回来合影，字标压轴登场——观众离场前最后记住的是\"这些东西属于同一个产品\"。规格必须是发布会级：能量推到全片最高。",
+    "source": "references/shots/outro/outro-group-photo-launch.md",
+    "updatedAt": "2026-07-27T05:24:52Z",
+    "styles": [
+      {
+        "key": "outro-group-photo-launch",
+        "label": "outro-group-photo-launch",
+        "description": "全片元素从四面八方飞来围住字标合影，crane 落机位+舞台光+金尘做成发布会收场",
+        "media": {
+          "url": "./media/outro-group-photo-launch.mp4?v=1784437314661",
+          "type": "mp4"
+        }
+      }
+    ],
+    "sourceUrl": "./source/outro-group-photo-launch.md",
+    "category": "outro",
+    "tags": [
+      "outro"
+    ]
+  },
+  {
+    "name": "spotlight-hero-card",
+    "summary": "聚光灯扫过页面锁定一张卡，斜 45° 推进后卡片弹起悬浮、光束沿轮廓两圈、贴回原位",
+    "use": "\"单一主角\"式产品开场；把一个核心对象（卡片/条目/模块）立成全片主角",
+    "duration": "约 4.6s（82–220f）",
+    "energy": "中（质感最高的一镜，节奏慢而稳）",
+    "intention": "开场只讲一件事：这一张卡就是产品的原子单位。聚光灯替观众做视线引导，弹起悬浮给它体积和重量，轮廓光束是\"扫描/检视\"的隐喻，最后贴回原位表示它属于这个页面。",
+    "source": "references/shots/opening/spotlight-hero-card.md",
+    "updatedAt": "2026-07-26T15:15:01Z",
+    "styles": [
+      {
+        "key": "spotlight-hero-card",
+        "label": "spotlight-hero-card",
+        "description": "聚光灯扫过页面锁定一张卡，斜 45° 推进后卡片弹起悬浮、光束沿轮廓两圈、贴回原位",
+        "media": {
+          "url": "./media/spotlight-hero-card.mp4?v=1785050510059",
+          "type": "mp4"
+        }
+      }
+    ],
+    "sourceUrl": "./source/spotlight-hero-card.md",
+    "category": "opening",
+    "tags": [
+      "opening",
+      "effects",
+      "camera"
+    ]
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "name": "kuaidian-kuaidian-launch-film",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "capture": "node scripts/capture.mjs",
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts LaunchFilm out/kuaidian-kuaidian-launch.mp4 --codec=h264 --crf=18 --concurrency=3",
+    "render:sfx": "remotion render src/index.ts LaunchFilm out/kuaidian-kuaidian-launch-sfx.mp4 --codec=h264 --crf=18 --concurrency=3 --props=props-nobgm.json"
+  },
+  "dependencies": {"@remotion/cli":"4.0.484","remotion":"4.0.484","react":"19.2.7","react-dom":"19.2.7","puppeteer-core":"24.31.0"},
+  "devDependencies": {"@types/react":"19.2.17","typescript":"6.0.3"}
+}

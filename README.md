@@ -8,7 +8,22 @@
 
 > **Chrome 扩展已发布，源码继续按 MIT 开源。** 使用时仍需单独安装本地助手；Chrome 商店发布不代表本地助手已获操作系统签名、公证或安装验收。当前助手未做 Windows 代码签名、Mac 签名／公证；真实 Chrome 安装、Windows 置顶、Mac 实机安装和 GPT 跨资料控制仍待验收。系统可能提示未知发布者或阻止运行，请核对来源并遵循设备策略，不关闭系统防护。
 
+## 32 秒产品宣传片
+
+[![快店快点宣传片封面：点击观看 32 秒产品演示](docs/promo-poster.jpg)](https://cartmancxx.github.io/kuaidian-kuaidian/#film)
+
+真实产品界面，使用示例店铺数据；使用产品时需安装 **Chrome 扩展 + 本地助手**。
+
+[在线观看](https://cartmancxx.github.io/kuaidian-kuaidian/#film) · [下载配乐版 MP4](https://github.com/Cartmancxx/kuaidian-kuaidian/releases/download/v1.0.0-store.1/kuaidian-kuaidian-launch.mp4) · [下载无配乐版 MP4（保留音效）](https://github.com/Cartmancxx/kuaidian-kuaidian/releases/download/v1.0.0-store.1/kuaidian-kuaidian-launch-sfx.mp4) · [宣传片源码工程](promotional-video/)
+
+宣传片与官网属于主分支的后续营销更新，不改变已发布的 `v1.0.0-store.1` 助手、源码快照或标签。视频附件单独提供。
+
+<details>
+<summary>查看店铺小窗截图</summary>
+
 ![紧凑店铺小窗，画面为示例数据](ShopController/store/assets/screenshot-launcher.jpg)
+
+</details>
 
 ## 能做什么
 
