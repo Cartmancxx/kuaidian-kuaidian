@@ -51,6 +51,34 @@ def extension_id_from_key(key: str) -> str:
     return ''.join(chr(ord('a') + int(nibble, 16)) for nibble in digest)
 
 
+def store_publication(metadata: dict, store_id: str) -> tuple[bool, str]:
+    """Validate declared publication metadata; never infer approval from an ID alone."""
+    published = metadata.get('storePublished', False)
+    if not isinstance(published, bool):
+        raise ValueError('storePublished must be an explicit boolean')
+    listing = metadata.get('storeListingUrl') or ''
+    if listing:
+        if not isinstance(listing, str):
+            raise ValueError('storeListingUrl must be a string')
+        parsed = urlparse(listing)
+        if (parsed.scheme != 'https' or
+                parsed.netloc != 'chromewebstore.google.com' or
+                not parsed.path.startswith('/detail/') or
+                parsed.path.rstrip('/').split('/')[-1] != store_id or
+                parsed.query or parsed.fragment or not re.fullmatch('[a-p]{32}', store_id)):
+            raise ValueError('storeListingUrl must be the canonical HTTPS Chrome Web Store listing for extensionId')
+    if published and not listing:
+        raise ValueError('A published store release requires its verified storeListingUrl')
+    return published, listing
+
+
+def output_suffix(value: str) -> str:
+    """Keep independent channel releases beneath dist without accepting filesystem paths."""
+    if value and not re.fullmatch(r'[a-z0-9](?:[a-z0-9.-]{0,38}[a-z0-9])?', value):
+        raise ValueError('Output suffix must be 1-40 lowercase ASCII letters, digits, dots or hyphens')
+    return '-' + value if value else ''
+
+
 def checked_dist(path: Path) -> Path:
     path = path.absolute()
     if path == DIST or not path.is_relative_to(DIST):
@@ -108,7 +136,9 @@ def main():
     parser.add_argument('--skip-build', action='store_true')
     parser.add_argument('--build-only', action='store_true')
     parser.add_argument('--require-publish-ready', action='store_true')
+    parser.add_argument('--output-suffix', default='', help='Keep a channel/repack in a distinct dist directory, e.g. store.1')
     args = parser.parse_args()
+    release_suffix = output_suffix(args.output_suffix)
     if args.skip_build and args.build_only:
         parser.error('--build-only and --skip-build are mutually exclusive')
     if args.extension_id and not re.fullmatch('[a-p]{32}', args.extension_id):
@@ -126,6 +156,7 @@ def main():
     if args.extension_id and configured_id and args.extension_id != configured_id:
         raise ValueError('Command-line extension ID differs from release-config.json')
     store_id = args.extension_id or configured_id
+    store_published, store_listing = store_publication(release_metadata, store_id)
     binding_id = github_id if args.channel == 'github' else store_id
     identity_source = 'manifest-key' if args.channel == 'github' else ('chrome-web-store' if store_id else 'unbound')
     product_name = release_metadata.get('productName') or manifest['name']
@@ -145,7 +176,6 @@ def main():
     if args.channel == 'store':
         if not store_id:
             pending.append('Official Chrome Web Store extension ID is not bound')
-        pending.extend(warnings)
     else:
         warnings.extend(['GitHub public beta uses Load unpacked in Chrome developer mode; enterprise policies may restrict it',
                          'Chrome Web Store approval is not implied by this GitHub release'])
@@ -232,7 +262,7 @@ def main():
         shutil.copy2(license_path, extension_stage / 'LICENSE.txt')
     info_path = extension_stage / 'release-info.json'
     release_info = json.loads(info_path.read_text(encoding='utf-8-sig')) if info_path.is_file() else {}
-    for field in ('productName', 'publisherName', 'supportEmail', 'privacyPolicyUrl', 'downloadPageUrl'):
+    for field in ('productName', 'publisherName', 'supportEmail', 'privacyPolicyUrl', 'downloadPageUrl', 'storeListingUrl'):
         release_info[field] = release_metadata.get(field) or ''
     write_json(info_path, release_info)
     # Production code should never silently fall back to fixture accounts.
@@ -295,7 +325,7 @@ def main():
                 info.external_attr = (stat.S_IFREG | (0o755 if executable_archive_file(file) else 0o644)) << 16
                 if name == 'ShopController' and relative.as_posix() == 'release-config.json':
                     public_fields = ('productName', 'version', 'publisherName', 'supportEmail', 'privacyPolicyUrl',
-                                     'downloadPageUrl', 'extensionId', 'windowsSigned', 'macNotarized',
+                                     'downloadPageUrl', 'extensionId', 'storeListingUrl', 'storePublished', 'windowsSigned', 'macNotarized',
                                      'windowsSmokeTested', 'macSmokeTested')
                     source_metadata = {key: release_metadata[key] for key in public_fields if key in release_metadata}
                     archive.writestr(info, json.dumps(source_metadata, ensure_ascii=False, indent=2).encode('utf-8'))
@@ -319,8 +349,9 @@ def main():
     write_json(stage / 'release-manifest.json', {
         'version': version, 'channel': args.channel, 'identitySource': identity_source,
         'extensionId': binding_id or None, 'storeExtensionId': store_id or None,
-        'githubExtensionId': github_id, 'distributionStatus': 'public-beta-build' if args.channel == 'github' else 'store-submission-build',
-        'storeApproval': 'not-submitted', 'macRuntimeTest': 'not-performed-on-this-windows-host',
+        'githubExtensionId': github_id, 'distributionStatus': 'public-beta-build' if args.channel == 'github' else ('store-linked-helper-build' if store_published else 'store-submission-build'),
+        'storeApproval': 'published' if store_published else 'not-submitted', 'storeListingUrl': store_listing or None,
+        'macRuntimeTest': 'not-performed-on-this-windows-host',
         'signatureStatus': 'unsigned', 'packages': package_records, 'pendingReleaseRequirements': pending,
         'productName': product_name, 'warnings': warnings,
     })
@@ -337,9 +368,14 @@ def main():
         channel_status = '这是可分发的 GitHub 公开测试构建，不代表商店已上架、操作系统签名已完成或真实 Mac 验收已通过。签名与真实机器验收是已公开的测试版限制，不阻止此渠道产物生成。'
     else:
         binding = ('已绑定正式扩展 ID：' + store_id) if store_id else '尚未绑定正式商店扩展 ID；安装助手时需输入实际 ID。'
-        channel_instructions = '首次上传无 key 的扩展 ZIP 后，在商店开发者控制台读取正式 ID，再执行 `publish-release.ps1 -Channel store -ExtensionId <实际ID>` 生成已绑定助手。安装器把此 ID 同时写入宿主身份文件与 Chrome 白名单。任何测试 ID 均不得冒充正式 ID。'
+        channel_instructions = (f'''1. 从 [Chrome 应用商店]({store_listing}) 安装快店快点，固定到 Chrome 工具栏；普通用户无需开发者模式或扩展 ZIP。
+2. 下载并完整解压对应系统的本地助手包，Windows 运行 `Install.cmd`，Mac 运行 `Install.command`。
+3. 助手已绑定商店 ID `{store_id}`；安装器把此 ID 同时写入宿主身份文件与 Chrome 白名单。
+4. 回到扩展的连接助手页点重试，再核对店铺与 Chrome 资料绑定。
+
+从旧 GitHub 开发者模式版本迁移：先关闭旧小窗并停用旧扩展，备份产品 `config.json` 与 `.bak`。在已解压的新助手目录运行 `Install.cmd --replace-identity`（Windows），或 `./Install.command --replace-identity`（Mac）。这是用户明确选择的身份迁移，配置保留，Chrome 资料和 Cookie 不改动。同一系统用户只保留一个活动助手身份，旧版扩展将不再连接；需回退时使用旧渠道助手并明确选择同样的迁移参数。''' if store_published else '首次上传无 key 的扩展 ZIP 后，在商店开发者控制台读取正式 ID，再执行 `publish-release.ps1 -Channel store -ExtensionId <实际ID>` 生成已绑定助手。安装器把此 ID 同时写入宿主身份文件与 Chrome 白名单。任何测试 ID 均不得冒充正式 ID。')
         unpacked_bullet = ''
-        channel_status = '这是商店提交渠道的构建交付，尚未提交商店，也没有宣称已通过审核。公开商店发行前请完成身份绑定、签名和真实机器验收。'
+        channel_status = ('Chrome 扩展已经在上面所列商店地址发布；本交付提供与该扩展 ID 绑定的独立本地助手。商店扩展审核不等于本地助手已签名、公证或完成真实机器验收。' if store_published else '这是商店提交渠道的构建交付，未声明商店审核结果。签名、公证与真实机器验收状态作为本地助手的独立限制公开。')
     (stage / '交付说明.md').write_text(f'''# {product_name} {version} 发布交付
 
 ## 包的用途
@@ -374,14 +410,14 @@ Windows 签名、Mac Developer ID 签名/公证、Mac 真实机器安装启动�
 ''', encoding='utf-8')
     hashes = [f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}' for p in sorted(stage.glob('*.zip'))]
     (stage / 'SHA256SUMS.txt').write_text('\n'.join(hashes) + '\n', encoding='ascii')
-    output = checked_dist(DIST / ('ShopController-release-' + version))
+    output = checked_dist(DIST / ('ShopController-release-' + version + release_suffix))
     if output.exists():
         if not (output / '.shopcontroller-release-output').is_file():
             raise ValueError(f'Existing output has no build marker; preserving it: {output}')
         output.rename(checked_dist(DIST / (output.name + '.previous-' + stamp)))
     stage.rename(output)
     # A compact hand-off archive includes compressed deliverables, not their duplicate extracted trees.
-    delivery = checked_dist(DIST / f'快店快点-{version}-完整交付.zip')
+    delivery = checked_dist(DIST / f'快店快点-{version}{release_suffix}-完整交付.zip')
     delivery_stage = checked_dist(DIST / f'.ShopController-delivery-{stamp}.zip')
     with zipfile.ZipFile(delivery_stage, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         selected = [p for p in sorted(output.glob('*.zip'))]
@@ -392,7 +428,7 @@ Windows 签名、Mac Developer ID 签名/公证、Mac 真实机器安装启动�
             archive.write(file, file.relative_to(output).as_posix(),
                           compress_type=zipfile.ZIP_STORED if file.suffix == '.zip' else zipfile.ZIP_DEFLATED)
     if delivery.exists():
-        delivery.rename(checked_dist(DIST / f'快店快点-{version}-完整交付.previous-{stamp}.zip'))
+        delivery.rename(checked_dist(DIST / f'快店快点-{version}{release_suffix}-完整交付.previous-{stamp}.zip'))
     delivery_stage.rename(delivery)
     digest = hashlib.sha256(delivery.read_bytes()).hexdigest()
     checked_dist(DIST / (delivery.name + '.sha256')).write_text(f'{digest}  {delivery.name}\n', encoding='utf-8')

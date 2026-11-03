@@ -33,6 +33,7 @@ def main():
         prefix = "ShopController-win-x64/host/"
         with zipfile.ZipFile(archive_path) as archive:
             names = safe_names(archive)
+            package = json.loads(archive.read('ShopController-win-x64/release-config.json'))
             host_names = [name for name in names if name.startswith(prefix) and not name.endswith("/")]
             check(bool(host_names), "Release host payload exists")
             check(sum(archive.getinfo(name).file_size for name in host_names) < 512 * 1024 * 1024, "Bounded release payload")
@@ -44,7 +45,7 @@ def main():
         executable = host / "ShopController.Host.exe"
         check(executable.is_file(), "Published Windows apphost exists")
         identity = host / "host-identity.json"
-        identifier = "abcdefghijklmnopabcdefghijklmnop"
+        identifier = package.get('extensionId') or "abcdefghijklmnopabcdefghijklmnop"
         origin = f"chrome-extension://{identifier}/"
         body = json.dumps({"action": "get_capabilities"}).encode()
         frame = struct.pack("<I", len(body)) + body
@@ -63,6 +64,11 @@ def main():
         wrong = invoke("chrome-extension://" + "p" * 32 + "/")
         check(wrong.returncode == 2 and wrong.stdout == b"", "Published apphost must refuse an unrelated extension")
         print("PASS published apphost refuses an unrelated extension origin")
+        if package.get('channel') == 'store':
+            check(identifier == 'ckeiapojbffhmmedjajdbnpfongmfjmm', 'Store archive binds the published extension identity')
+            legacy = invoke('chrome-extension://hadeebhijljjdebkaiaglaeipajnnind/')
+            check(legacy.returncode == 2 and legacy.stdout == b'', 'Store identity refuses the legacy GitHub unpacked extension')
+            print('PASS published store identity rejects the legacy GitHub extension origin')
         result = invoke(origin)
         check(result.returncode == 0, "Published apphost starts: " + result.stderr.decode(errors="replace"))
         check(len(result.stdout) >= 4 and struct.unpack("<I", result.stdout[:4])[0] == len(result.stdout) - 4,
@@ -73,7 +79,8 @@ def main():
               "Published host capabilities match the Windows release contract")
         check(not (root / "config.json").exists() and not (host / "config.json").exists(), "No fixture shop configuration created")
         print("PASS published self-contained Windows apphost starts and returns release capabilities")
-    print("\n3/3 isolated Windows release startup checks passed. No installation, registry or browser action was performed.")
+    count = 4 if package.get('channel') == 'store' else 3
+    print(f"\n{count}/{count} isolated Windows release startup checks passed. No installation, registry or browser action was performed.")
 
 
 if __name__ == "__main__":

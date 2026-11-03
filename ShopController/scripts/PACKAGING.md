@@ -22,10 +22,25 @@ PowerShell 包装器提供对应 `-Channel github -SkipBuild -Dotnet <路径>` �
 ## Chrome Web Store 渠道
 
 ```powershell
-python ShopController/scripts/publish_release.py --channel store --extension-id <正式商店ID> --dotnet <dotnet路径>
+python ShopController/scripts/publish_release.py --channel store --output-suffix store.1 --dotnet <dotnet路径>
 ```
 
-默认渠道仍为 `store`，保持旧命令兼容。商店上传 ZIP 删除 key。未传 ID 时生成待绑定助手，首次安装需要输入实际 ID；不使用测试 ID 冒充商店身份。此渠道的严格准备检查仍包含签名/真实机器验收待办。
+正式扩展已经发布：[Chrome 应用商店](https://chromewebstore.google.com/detail/%E5%BF%AB%E5%BA%97%E5%BF%AB%E7%82%B9/ckeiapojbffhmmedjajdbnpfongmfjmm)，ID 为 `ckeiapojbffhmmedjajdbnpfongmfjmm`。版本仍为 `1.0.0`；`v1.0.0-store.1` 是助手分发渠道的 GitHub tag，不冒充商店扩展升级。
+
+默认渠道仍为 `store`，保持旧命令兼容。正式 ID 从 `release-config.json` 读取；命令行 ID 与配置冲突时拒绝打包。商店上传 ZIP 删除 key，供开发者后续提交；普通用户直接从商店安装，不使用这个 ZIP。三个助手包仅绑定正式商店 ID，不混入旧 GitHub 加载版 ID。
+
+`storePublished` 与 `storeListingUrl` 是已核实的公开发行记录。构建脚本校验 URL 与 ID 一致，但不联网重新审核商店，也不推断签名、公证或实机验收成功。`--require-publish-ready` 仅检查渠道必需元数据；签名、公证和真实机器验收始终独立记录在 `warnings`。
+
+`--output-suffix store.1`（PowerShell：`-OutputSuffix store.1`）生成 `dist/ShopController-release-1.0.0-store.1` 与 `dist/快店快点-1.0.0-store.1-完整交付.zip`，保留旧 GitHub 渠道资产不动。三种助手文件名继续包含真实产品版本 `1.0.0`，下载链接通过独立 tag 区分渠道。
+
+### 旧 GitHub 加载版迁移
+
+同一系统用户只登记一个 `com.shopcontroller.chrome` 助手身份。先备份产品 `config.json` 与 `.bak`，关闭旧小窗并停用开发者模式扩展，然后在完整解压的新商店助手目录手动执行：
+
+- Windows：`Install.cmd --replace-identity`
+- Mac：`./Install.command --replace-identity`
+
+安装器原有身份冲突保护保留，不会静默替换身份。店铺配置、Chrome 资料及 Cookie 保留；迁移后旧开发者模式扩展不再连接助手。回退需用旧渠道助手并明确选择身份迁移参数。首次安装不需要此参数。
 
 ## 源码与许可证
 

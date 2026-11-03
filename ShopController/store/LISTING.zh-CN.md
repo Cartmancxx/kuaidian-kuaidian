@@ -1,6 +1,6 @@
-# Chrome Web Store 商品文案草稿 · 快店快点
+# Chrome Web Store 商品文案 · 快店快点
 
-当前发布渠道为 [GitHub 1.0.0 公测](https://github.com/Cartmancxx/kuaidian-kuaidian/releases/tag/v1.0.0)，尚未提交或通过商店审核。以下为未来商店投稿素材，不能当作现有商店页面。
+扩展已在 [Chrome Web Store](https://chromewebstore.google.com/detail/快店快点/ckeiapojbffhmmedjajdbnpfongmfjmm) 发布。正式 ID：`ckeiapojbffhmmedjajdbnpfongmfjmm`。本文件保留商品文案与后续更新依据，商店实时展示以页面为准；本地助手仍独立分发。
 
 ## 基本信息
 - 名称：快店快点
@@ -10,7 +10,7 @@
 - 建议分类：工具 / 效率（以商店后台实际分类为准）
 - 单一用途：管理多店铺后台入口，并通过配套本地助手在用户指定的 Chrome 个人资料中打开对应网址。
 - 隐私政策：https://cartmancxx.github.io/kuaidian-kuaidian/privacy.html
-- 主页/下载页：https://cartmancxx.github.io/kuaidian-kuaidian/（目前为 GitHub 公测安装指引；商店投稿前需补对应渠道）。
+- 主页/下载页：https://cartmancxx.github.io/kuaidian-kuaidian/（商店安装与配套助手下载指引）。
 
 ## 简短描述
 用紧凑小窗管理多店铺入口，按指定 Chrome 资料打开后台。需要本地助手；不读取或搬运 Cookie。
@@ -46,4 +46,4 @@
 - screenshot-launcher.jpg：1280 × 800，真实小窗渲染搭配说明；显著标注示例数据。
 - screenshot-manager.jpg：1280 × 800，管理页示例。
 
-公开描述不包含“已通过审核”“永久免费”“零风险”“自动登录所有平台”等未经确认承诺。价格及地区由发布者在提交时自行选择。
+公开描述不把扩展上架扩展为本地助手已获系统签名、公证或安全认证；不使用“永久免费”“零风险”“自动登录所有平台”等未经确认承诺。价格及地区由发布者在商店后台管理。

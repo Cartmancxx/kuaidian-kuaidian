@@ -34,7 +34,33 @@ def main():
     for file in expected_sources:
         assert (root / file).is_file(), "Missing public build/source document: " + file
     print("PASS source release allowlist includes MIT license, build configuration, dependency lock and CI")
-    print("3/3 release-policy groups passed without building, installing or publishing.")
+    store_id = 'ckeiapojbffhmmedjajdbnpfongmfjmm'
+    metadata = json.loads((root / 'ShopController/release-config.json').read_text(encoding='utf-8-sig'))
+    published, listing = module.store_publication(metadata, metadata['extensionId'])
+    assert published is True and metadata['extensionId'] == store_id and listing.endswith('/' + store_id)
+    assert metadata['extensionId'] != expected, 'Store and unpacked identity remain separate'
+    assert module.store_publication({}, '') == (False, '')
+    for bad in ({'storePublished': 'true'}, {'storePublished': True},
+                {'storeListingUrl': 42}, {'storeListingUrl': 'http://chromewebstore.google.com/detail/' + store_id},
+                {'storeListingUrl': 'https://example.com/detail/' + store_id},
+                {'storeListingUrl': 'https://chromewebstore.google.com/detail/' + expected},
+                {'storeListingUrl': listing + '?tracking=example'},
+                {'storeListingUrl': listing + '#fragment'}):
+        try:
+            module.store_publication(bad, store_id)
+        except ValueError:
+            continue
+        raise AssertionError('Invalid store publication metadata was accepted: ' + repr(bad))
+    print('PASS official store publication metadata is explicit, correctly bound, and distinct from the unpacked ID')
+    assert module.output_suffix('') == '' and module.output_suffix('store.1') == '-store.1'
+    for bad in ('../outside', '/outside', '..', 'store/', 'store\\path', 'Store', 'a' * 41, 'store\n'):
+        try:
+            module.output_suffix(bad)
+        except ValueError:
+            continue
+        raise AssertionError('Unsafe release output suffix was accepted: ' + repr(bad))
+    print('PASS isolated release output suffix accepts channel labels and rejects traversal/path values')
+    print("5/5 release-policy groups passed without building, installing or publishing.")
 
 
 if __name__ == "__main__":

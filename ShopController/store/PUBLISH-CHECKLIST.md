@@ -1,36 +1,39 @@
-# 快店快点 · GitHub 公测与未来商店发布清单
+# 快店快点 · 商店配套与开源发布清单
 
 本仓库按 MIT 开源。**GitHub 公开源码／公测与 Chrome Web Store 审核是不同渠道**；不能因为未签名就声称源码不可公开，也不能因为 GitHub 包可下载就声称已通过商店审核或平台验收。
 
-## A. 当前 GitHub 公开测试版
+## A. 当前商店配套渠道
 
-- 仓库：https://github.com/Cartmancxx/kuaidian-kuaidian
-- 本次预发布：https://github.com/Cartmancxx/kuaidian-kuaidian/releases/tag/v1.0.0
+- 商店：https://chromewebstore.google.com/detail/快店快点/ckeiapojbffhmmedjajdbnpfongmfjmm
+- 正式扩展 ID：`ckeiapojbffhmmedjajdbnpfongmfjmm`。
+- 配套助手：https://github.com/Cartmancxx/kuaidian-kuaidian/releases/tag/v1.0.0-store.1
 - 官网：https://cartmancxx.github.io/kuaidian-kuaidian/
 - 隐私：https://cartmancxx.github.io/kuaidian-kuaidian/privacy.html
-- 固定公开 key 对应扩展 ID：`hadeebhijljjdebkaiaglaeipajnnind`。
 
-1. 用 `python ShopController/scripts/publish_release.py --channel github --dotnet dotnet` 构建。GitHub 扩展包名含 `extension-unpacked`，保留 manifest.key；本地助手精确绑定同一 ID。
-2. 核对产物没有密码、个人资料、真实店铺配置、证书或私钥；保留 MIT 与运行时许可通知。
-3. 运行自动化测试与 ZIP 校验，生成当前文件的 SHA256SUMS.txt。任何重新构建或签名后必须重新计算摘要。
-4. 将 `v1.0.0` 标记为 **Pre-release / 公开测试版**，上传扩展、三架构助手、源码与摘要。GitHub 的 `/releases/latest` 不用于本次预发布链接；使用确定的 tag 和下载路径。
-5. 在 README、Release 和官网醒目标注：未签名／未公证、Mac 未实机运行验收、真实 Chrome／Windows 置顶／GPT 跨资料控制尚待实测。用户先解压加载扩展，再安装助手。
-6. GitHub Pages 从仓库根 `docs` 部署；内容来自 `store/public-site`。检查公开下载链接、隐私页和图片实际可访问，再告知用户发布完成。
+1. 用 `python ShopController/scripts/publish_release.py --channel store --extension-id ckeiapojbffhmmedjajdbnpfongmfjmm --output-suffix store.1 --dotnet dotnet` 构建。助手身份文件与 native host `allowed_origins` 必须精确绑定正式 ID。
+2. 本次产品版本仍 1.0.0；用独立标签 `v1.0.0-store.1` 发布商店配套助手，保留旧 `v1.0.0` 资产。禁止在同一路径静默覆盖不同身份的包。
+3. 核对产物没有密码、个人资料、真实店铺配置、证书或私钥；保留 MIT 与运行时许可通知。
+4. 运行自动化测试与 ZIP 校验，生成当前文件的 SHA256SUMS.txt。任何重新构建或签名后必须重新计算摘要。
+5. README、Release 和官网标明：扩展已发布，但助手未签名／未公证、Mac 未实机安装验收、真实 Chrome／Windows 置顶／GPT 跨资料控制待实测。不要把商店发布当作助手安全认证。
+6. 提供旧 GitHub ID 迁移步骤：备份配置、停用旧扩展、安装商店扩展、在解压目录显式运行 Windows `Install.cmd --replace-identity` 或 Mac `./Install.command --replace-identity`、重试连接与核对绑定。保持用户配置与 Chrome 资料不变。
+7. GitHub Pages 从仓库根 docs 部署；与 store/public-site 镜像一致。检查商店链接、三平台下载、隐私页、图片和摘要实际可访问，再告知用户更新完成。
 
 未签名包可能遇到系统拦截。不得提供关闭 Gatekeeper、防病毒或设备安全策略的指引。摘要用于核对内容，不等同于代码签名或安全认证。
 
-## B. 未来 Chrome Web Store 渠道
+## B. 后续商店扩展更新
 
-以下是后续商店投稿准备，不是开源仓库公开的前提。签名和实机验收是本项目更成熟分发的质量要求，不应冒充 GitHub 或 Chrome Web Store 对所有开源项目的统一规定。
+1. 保持正式商店项目与 ID；商店 ZIP 不带开发用 key，仅上传扩展，不上传助手或源码包。
+2. 有功能修改时按 Chrome 商店规则递增扩展版本，更新文案与隐私声明并提交审核；当前仅配套分发更新不虚构新扩展版本。
+3. 助手或协议有变动时，同时提供兼容版本、迁移说明与绑定正式 ID 的助手下载。扩展自动更新不等于助手自动更新。
+4. 为准备承诺支持的平台完成真实安装、更新、卸载与 Chrome 路由验证。Windows 签名、Mac Developer ID 签名和公证作为后续分发改进，证书不进入源码库。
+5. 签名改变文件后重打包、重算摘要；如新增验收结论，附真实证据，不只改配置布尔值。
+6. 用 LISTING.zh-CN.md、PRIVACY-FIELDS.md、REVIEWER-INSTRUCTIONS.en.md 维护审核资料；每次更新审核结果独立，以商店状态为准。
 
-1. 以 `--channel store` 生成不带 key 的商店 ZIP，上传新项目草稿；只传扩展，不传助手或源码包。
-2. 取得该项目真实扩展 ID。为商店渠道生成绑定该 ID 的助手，不能默认沿用 GitHub ID。记录两个渠道的迁移与安装方式。
-3. 配置真实 HTTPS 下载页和隐私页，并提供审核人员能下载使用的匹配助手；不使用占位链接。
-4. 为准备承诺支持的平台完成真实安装、更新、卸载与 Chrome 路由验证。准备 Windows 发布者签名；Mac 使用自己的 Developer ID 和 Apple 公证凭据完成签名／公证，并在浏览器下载场景验证 Gatekeeper 行为。证书不进入源码库。
-5. 签名改变文件后重新打包、重算 SHA256，按真实状态更新说明；Windows 交叉构建不能替代 Mac 实机验证。
-6. 更新 REVIEWER-INSTRUCTIONS.en.md，明确本次商店 ID 和匹配助手；GitHub 公测包不能被误写成商店审核构建。
-7. 用 LISTING.zh-CN.md、PRIVACY-FIELDS.md、图标和示例截图填写商品页面与隐私实践，再提交审核。价格、地区及发布者身份由发布者自行确认。
-8. 审核结果由 Chrome Web Store 决定。获批前不显示商店安装按钮或“已通过审核”字样。
+## C. 保留 GitHub 开发者模式
+
+旧渠道： https://github.com/Cartmancxx/kuaidian-kuaidian/releases/tag/v1.0.0 ，公开 key 对应 ID `hadeebhijljjdebkaiaglaeipajnnind`。
+
+用 `--channel github --output-suffix github` 构建含 key 的未打包扩展和绑定其派生 ID 的助手。用户手动加载/刷新，配套助手不得混用商店版。不要删除旧资产，也不要用 `/releases/latest` 替换历史下载地址。一个本地助手登记同一时间绑定一个 ID。
 
 ## 真实环境验收表（完成后附证据）
 
@@ -47,7 +50,7 @@
 
 ## 构建门槛与证据
 
-`release-manifest.json` 记录真实未完成项。`--require-publish-ready` 是严格的后续商店／签名发布预检；GitHub 未签名公测不需要假造已签名状态来通过它。保留风险披露和待办，使用对应渠道的检查，不删除真实待办或把布尔开关当作签名、公证、实测证据。
+`release-manifest.json` 记录真实未完成项。`--require-publish-ready` 仅检查对应渠道的必需元数据（包括商店渠道的扩展 ID）；通过此检查不代表助手已签名、公证或完成实机安装验收。签名和实测限制仍保留在 `warnings`，不得删除风险披露、假造已完成状态或把布尔开关当作验证证据。
 
 ## 官方参考
 

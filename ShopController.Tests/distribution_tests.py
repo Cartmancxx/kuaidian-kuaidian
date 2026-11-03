@@ -77,7 +77,7 @@ def main():
             require(current.is_file() and current.read_bytes() == archive.read(name), "Store payload matches reviewed current source: " + name)
         release_info = json.loads(archive.read("release-info.json"))
         metadata = json.loads((product / "release-config.json").read_text(encoding="utf-8-sig"))
-        for field in ("productName", "publisherName", "supportEmail", "privacyPolicyUrl", "downloadPageUrl"):
+        for field in ("productName", "publisherName", "supportEmail", "privacyPolicyUrl", "downloadPageUrl", "storeListingUrl"):
             require(release_info.get(field) == metadata.get(field), "Packaged public metadata matches release configuration: " + field)
         done("store ZIP has root MV3 manifest, production-only assets, minimal permissions, valid icons")
 
@@ -110,6 +110,10 @@ def main():
             if channel == "github":
                 require(config.get("channel") == "github" and config.get("identitySource") == "manifest-key", "Helper declares the GitHub identity channel")
                 require(identifier == github_id and config.get("bindingStatus") == "bound", "GitHub helper is bound to the independently computed unpacked extension ID")
+            else:
+                require(config.get("channel") == "store" and config.get("identitySource") == "chrome-web-store", "Helper declares its distinct store identity channel")
+                require(identifier == metadata['extensionId'] == release.get('storeExtensionId'), "All store helpers bind the configured official listing identity")
+                require(identifier != github_id, "Store helper never silently binds the unpacked development identity")
             require(not any(PurePosixPath(name).name in {"config.json", "Cookies", "Login Data", "host-identity.json"} for name in names), "No personal browser/configuration data or preinstalled identity")
             executable = prefix + "host/ShopController.Host" + (".exe" if cpu is None else "")
             data = archive.read(executable)
@@ -154,12 +158,14 @@ def main():
         seen.add(name)
         require(hashlib.sha256((root / name).read_bytes()).hexdigest() == digest, "ZIP digest matches " + name)
     require(seen == {file.name for file in root.glob("*.zip")}, "All release ZIPs covered by checksums")
-    require(release.get("storeApproval") == "not-submitted" and release.get("signatureStatus") == "unsigned", "Release metadata does not claim unperformed submission/signing")
+    expected_store_status = 'published' if metadata.get('storePublished') else 'not-submitted'
+    require(release.get("storeApproval") == expected_store_status and release.get("signatureStatus") == "unsigned", "Release metadata separates declared store publication from unsigned helper status")
+    require(release.get('storeListingUrl') == metadata.get('storeListingUrl'), 'Published release exposes the canonical configured listing URL')
     if channel == "github":
         require(isinstance(release.get("pendingReleaseRequirements"), list), "GitHub readiness requirements use an explicit list")
         require(release.get("warnings"), "Unsigned and untested platform status remains disclosed even when GitHub requirements are complete")
     else:
-        require(release.get("pendingReleaseRequirements"), "Outstanding store release checks are explicit")
+        require(isinstance(release.get("pendingReleaseRequirements"), list) and release.get('warnings'), "Store metadata requirements and helper signing/acceptance warnings remain separate")
     done("all ZIP checksums verify and release metadata discloses remaining public-release gates")
 
     print(f"\n{passed}/{passed} distribution archive groups passed. No files were installed or executed.")

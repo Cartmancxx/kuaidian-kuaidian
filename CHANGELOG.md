@@ -1,5 +1,13 @@
 # 更新记录
 
+## 商店发布配套更新 — 2026-11-03
+
+- Chrome 商店扩展已发布，正式 ID：`ckeiapojbffhmmedjajdbnpfongmfjmm`。
+- `v1.0.0-store.1` 提供绑定该 ID 的三平台助手；产品版本仍为 1.0.0。
+- 官网与安装指引默认走商店安装，保留旧 GitHub 开发者模式作为开发用途。
+- 增加从旧 ID 迁移、助手重新绑定、保留配置与独立更新说明。
+- 商店扩展发布不改变助手未签名／未公证及真实环境待验收状态。
+
 ## 1.0.0 — 2026-10-28
 
 首个 GitHub 开源公测版，MIT 许可。
@@ -12,4 +20,4 @@
 - Windows x64、Mac Apple Silicon 与 Intel 助手，自带 .NET 10 运行时。
 - 中文安装文档、公开下载页、隐私政策、自动化检查。
 
-本版助手未代码签名，Mac 未 Developer ID 签名或公证；真实 Chrome 安装/资料路由、Windows置顶和 GPT 跨资料控制仍待验收。自动化检查不替代系统安装、Gatekeeper 或实际店铺登录测试。Chrome Web Store 尚未提交审核。
+本版助手未代码签名，Mac 未 Developer ID 签名或公证；真实 Chrome 安装/资料路由、Windows置顶和 GPT 跨资料控制仍待验收。自动化检查不替代系统安装、Gatekeeper 或实际店铺登录测试。当时 Chrome Web Store 尚未提交审核；现状见上方商店发布配套更新。

@@ -2,6 +2,7 @@
 param(
     [ValidateSet('store', 'github')][string]$Channel = 'store',
     [string]$ExtensionId = '',
+    [string]$OutputSuffix = '',
     [string]$Dotnet = '',
     [string]$Python = '',
     [switch]$SkipBuild,
@@ -13,6 +14,7 @@ if (-not $Python) { $Python = (Get-Command python -ErrorAction Stop).Source }
 $arguments = @((Join-Path $PSScriptRoot 'publish_release.py'))
 $arguments += @('--channel', $Channel)
 if ($ExtensionId) { $arguments += @('--extension-id', $ExtensionId) }
+if ($OutputSuffix) { $arguments += @('--output-suffix', $OutputSuffix) }
 if ($Dotnet) { $arguments += @('--dotnet', $Dotnet) }
 if ($SkipBuild) { $arguments += '--skip-build' }
 if ($BuildOnly) { $arguments += '--build-only' }
